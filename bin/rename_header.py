@@ -33,7 +33,7 @@ def rename_header(fasta, metadata_B_dict, reverse_complementary_headers):
         assert isolate_name[0] == subtype[0]
         assert isolate_name[0] in ["A", "B"]
         assert empty == ""
-        assert segment in ["HA", "MP", "NA", "NP", "NS", "PA", "PA", "PB1", "PB2"]
+        assert segment in ["HA", "MP", "NA", "NP", "NS", "PA", "PB1", "PB2"]
 
         if isolate_name[0] == "A":
             kraken = "kraken:taxid|11320"
