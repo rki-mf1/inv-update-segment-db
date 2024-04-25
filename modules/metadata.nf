@@ -18,4 +18,9 @@ process concat_metadata_excel_files {
     """
     concat_excels.py ${metadata_excel}
     """
+
+    stub:
+    """
+    touch concatenated_metadata.xlsx
+    """
 }

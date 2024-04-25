@@ -14,6 +14,11 @@ process align_reference{
     # align only the reference without the adjust direction option - make sure the references are not reverse complementatry aligned
     mafft --thread ${task.cpus} ${reference} > ${segment}_reference_mafft.fasta
     """
+
+    stub:
+    """
+    touch ${segment}_reference_mafft.fasta
+    """
 }
 
 process add_align_segments{
@@ -43,6 +48,11 @@ process add_align_segments{
 
     grep '^>_R_' ${segment}_mafft.fasta | sed "s/>_R_//" > ${segment}_rc_headers.txt
     """
+
+    stub:
+    """
+    touch ${segment}_rc_headers.txt
+    """
 }
 
 process correct_reverse_complements {
@@ -60,5 +70,10 @@ process correct_reverse_complements {
     """
     seqkit grep -v -f ${reverse_complement_list} ${fasta} > ${segment}_rc-fixed.fasta
     seqkit grep -f ${reverse_complement_list} ${fasta} | seqkit seq -r -p -v >> ${segment}_rc-fixed.fasta
+    """
+
+    stub:
+    """
+    touch ${segment}_rc-fixed.fasta"
     """
 }

@@ -21,6 +21,11 @@ process rename_headers {
     """
     rename_header.py ${fasta} ${metadata_excel} ${segment}_rc_headers.txt
     """
+
+    stub:
+    """
+    touch HA_renamed.fasta MP_renamed.fasta NA_renamed.fasta NP_renamed.fasta NS_renamed.fasta PA_renamed.fasta PA_renamed.fasta PB1_renamed.fasta PB2_renamed.fasta
+    """
 }
 
 process split_by_segment {
@@ -37,6 +42,11 @@ process split_by_segment {
     """
     split_by_segment.py ${fasta}
     """
+
+    stub:
+    """
+    touch HA.fasta MP.fasta NA.fasta NP.fasta NS.fasta PA.fasta PA.fasta PB1.fasta PB2.fasta
+    """
 }
 
 process concat_fasta { 
@@ -52,5 +62,9 @@ process concat_fasta {
     """
     cat ${fasta} > all_records.fasta
     dos2unix *.fasta 
+    """
+    stub:
+    """
+    touch all_records.fasta
     """
 }
