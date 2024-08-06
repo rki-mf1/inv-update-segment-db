@@ -1,0 +1,32 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf"
+    script "../main.nf"
+    tag "pipeline"
+
+    test("Vanilla stub test") {
+        tag "stub"
+        options '-stub'
+
+        when {
+            params {
+                input_metadata = "$projectDir/assets/dummy_file"
+                input_segments = "$projectDir/assets/dummy_file"
+                references = "$projectDir/assets/dummy_file"
+                intermediate = true
+
+                // $outputDir is a global nf-test variable
+                // https://www.nf-test.com/docs/testcases/global_variables/
+                output = "$outputDir"
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success }
+            )
+        }
+
+    }
+
+}
