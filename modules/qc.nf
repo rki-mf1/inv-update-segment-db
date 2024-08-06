@@ -24,8 +24,8 @@ process get_stats {
     label 'process_low'
 
     publishDir (
-        path: "${params.output}/intermediate",
-        mode: 'copy',
+        path:    "${params.output}/intermediate",
+        mode:    'copy',
         enabled: params.intermediate,
         pattern: "${fasta.baseName}_fx2tab.tsv"
     )

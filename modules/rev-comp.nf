@@ -27,8 +27,8 @@ process add_align_segments{
     label 'process_high'
 
     publishDir (
-        path: "${params.output}/intermediate",
-        mode: 'copy',
+        path:    "${params.output}/intermediate",
+        mode:    'copy',
         enabled: params.intermediate,
         pattern: "${segment}_rc_headers.txt"
     )

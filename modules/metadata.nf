@@ -3,8 +3,8 @@ process concat_metadata_excel_files {
     label 'process_single'
 
     publishDir (
-        path: "${params.output}/intermediate",
-        mode: 'copy',
+        path:    "${params.output}/intermediate",
+        mode:    'copy',
         enabled: params.intermediate
     )
 

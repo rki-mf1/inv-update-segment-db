@@ -4,10 +4,10 @@ process rename_headers {
     label 'process_single'
 
     publishDir (
-        path: "${params.output}",
-        mode: 'copy',
+        path:    "${params.output}",
+        mode:    'copy',
         pattern: "*.fasta",
-        saveAs: { fa -> "${segment}.all_noIdent_fewAmbig_corLen.fasta" }
+        saveAs:  { fa -> "${segment}.all_noIdent_fewAmbig_corLen.fasta" }
     )
 
     input:

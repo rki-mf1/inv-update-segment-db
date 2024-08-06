@@ -4,9 +4,9 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 //include modules
-include { concat_metadata_excel_files } from "./modules/metadata"
-include { rename_headers; split_by_segment; concat_fasta } from "./modules/utils"
-include { filter_fasta; get_stats; remove_duplicates } from "./modules/qc"
+include { concat_metadata_excel_files                                        } from "./modules/metadata"
+include { rename_headers; split_by_segment; concat_fasta                     } from "./modules/utils"
+include { filter_fasta; get_stats; remove_duplicates                         } from "./modules/qc"
 include { align_reference; add_align_segments; correct_reverse_complements;  } from "./modules/rev-comp"
 
 
