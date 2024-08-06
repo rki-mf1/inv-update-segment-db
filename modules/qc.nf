@@ -12,6 +12,11 @@ process filter_fasta {
     """
     clean_segment_DB.R ${fasta.baseName} ${fasta} ${stats}
     """
+    
+    stub:
+    """
+    touch ${fasta.baseName}_fewAmbig-corLen.fasta
+    """
 }
 
 process get_stats {
@@ -19,8 +24,8 @@ process get_stats {
     label 'process_low'
 
     publishDir (
-        path: "${params.output}/intermediate",
-        mode: 'copy',
+        path:    "${params.output}/intermediate",
+        mode:    'copy',
         enabled: params.intermediate,
         pattern: "${fasta.baseName}_fx2tab.tsv"
     )
@@ -34,6 +39,11 @@ process get_stats {
     script:
     """
     seqkit fx2tab -n -B efijlopqzx -n -B WSKMYRVHDBN -C WSKMYRVHDBN -l ${fasta} > ${fasta.baseName}_fx2tab.tsv
+    """
+    
+    stub:
+    """
+    touch ${fasta.baseName}_fx2tab.tsv
     """
 }
 
@@ -51,5 +61,10 @@ process remove_duplicates {
     """
     #remove seq with identical headers and identical sequences
     seqkit rmdup -n ${fasta} | seqkit rmdup -s > ${fasta.baseName}_noDups.fasta
+    """
+
+    stub:
+    """
+    touch ${fasta.baseName}_noDups.fasta
     """
 }

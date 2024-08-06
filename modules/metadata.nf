@@ -3,8 +3,8 @@ process concat_metadata_excel_files {
     label 'process_single'
 
     publishDir (
-        path: "${params.output}/intermediate",
-        mode: 'copy',
+        path:    "${params.output}/intermediate",
+        mode:    'copy',
         enabled: params.intermediate
     )
 
@@ -17,5 +17,10 @@ process concat_metadata_excel_files {
     script:
     """
     concat_excels.py ${metadata_excel}
+    """
+
+    stub:
+    """
+    touch concatenated_metadata.xlsx
     """
 }
