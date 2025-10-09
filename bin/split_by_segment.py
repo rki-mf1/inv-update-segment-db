@@ -4,6 +4,19 @@ import sys
 from Bio import SeqIO
 
 
+def get_segment_from_fasta_header(
+    fasta_header,
+    sep="|",
+    segment_set=set(["HA", "MP", "NA", "NP", "NS", "PA", "PB1", "PB2"]),
+):
+    header_fields_set = set(fasta_header.split(sep))
+    segment = segment_set & header_fields_set
+
+    assert len(segment) == 1
+
+    return list(segment)[0]
+
+
 def split_by_segment(fasta):
     fastas_per_segment_dict = {
         "HA": [],
@@ -17,9 +30,7 @@ def split_by_segment(fasta):
     }
 
     for record in SeqIO.parse(fasta, "fasta"):
-        number, segment, isolate_name, isolate_id, empty, subtype = record.id.split("|")
-
-        assert segment in ["HA", "MP", "NA", "NP", "NS", "PA", "PA", "PB1", "PB2"]
+        segment = get_segment_from_fasta_header(record.id)
 
         fastas_per_segment_dict[segment].append(record)
 
