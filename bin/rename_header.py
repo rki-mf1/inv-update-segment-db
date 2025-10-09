@@ -4,16 +4,67 @@ import os
 import sys
 from Bio import SeqIO
 import pandas as pd
+import re
 
 
-def get_influenza_B_metadata(excel):
+def get_segment_from_fasta_header(
+    fasta_header,
+    sep="|",
+    segment_set=set(["HA", "MP", "NA", "NP", "NS", "PA", "PB1", "PB2"]),
+):
+    header_fields_set = set(fasta_header.split(sep))
+    segment = segment_set & header_fields_set
+    assert len(segment) == 1
+    return list(segment)[0]
+
+
+def get_isolateid_from_fasta_header(
+    fasta_header,
+    sep="|",
+    pattern=r"^EPI_ISL_\d+$",
+):
+    isolate_id = None
+    for field in fasta_header.split(sep):
+        if re.fullmatch(pattern, field):
+            isolate_id = field
+    return isolate_id
+
+
+def get_metadata_from_excel(excel):
     metadata = pd.read_excel(
         excel, usecols=["Isolate_Id", "Isolate_Name", "Subtype", "Lineage"]
     )
-    metadata_B = metadata[metadata["Subtype"] == "B"]
-    # potential check: isolate_name[0] == subtype[0]
+    return metadata
 
-    return dict(zip(metadata_B["Isolate_Id"], metadata_B["Lineage"]))
+
+def get_field_value(df: pd.DataFrame, isolate_id: str, field_name: str):
+    """
+    Retrieve a field value from a DataFrame where Isolate_Id matches.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame
+        isolate_id (str): Value to match in Isolate_Id column
+        field_name (str): Name of the column whose value to retrieve
+
+    Returns:
+        Any: The value if found, None otherwise
+    """
+    # Ensure DataFrame has required columns
+    required_columns = ["Isolate_Id", field_name]
+    if not all(col in df.columns for col in required_columns):
+        raise ValueError(f"DataFrame missing required column(s): {required_columns}")
+
+    # Try to find matching row
+    try:
+        result = df[df["Isolate_Id"] == isolate_id][field_name].iloc[0]
+        # Handle NaN values
+        if pd.isna(result):
+            return ""
+
+        # Convert value to string
+        return str(result.strip())
+    except IndexError:
+        return None
 
 
 def read_header_list(txt):
@@ -24,32 +75,27 @@ def read_header_list(txt):
     return header_list
 
 
-def rename_header(fasta, metadata_B_dict, reverse_complementary_headers):
+def rename_header(fasta, metadata, reverse_complementary_headers):
     renamed_fastas = []
-
     for record in SeqIO.parse(fasta, "fasta"):
-        number, segment, isolate_name, isolate_id, empty, subtype = record.id.split("|")
+        segment = get_segment_from_fasta_header(record.id)
+        isolate_id = get_isolateid_from_fasta_header(record.id)
+        isolate_name = get_field_value(metadata, isolate_id, "Isolate_Name")
+        subtype = get_field_value(metadata, isolate_id, "Subtype").replace(" ", "_")
+        lineage = get_field_value(metadata, isolate_id, "Lineage")
 
-        assert isolate_name[0] == subtype[0]
         assert isolate_name[0] in ["A", "B"]
-        assert empty == ""
-        assert segment in ["HA", "MP", "NA", "NP", "NS", "PA", "PB1", "PB2"]
-
         if isolate_name[0] == "A":
             kraken = "kraken:taxid|11320"
-            lineage = ""
         elif isolate_name[0] == "B":
             kraken = "kraken:taxid|11520"
-            lineage = (
-                metadata_B_dict[isolate_id] if isolate_id in metadata_B_dict else ""
-            )
-
+        
         if record.id in reverse_complementary_headers:
-            direction = "rc"
+            orientation = "rc"
         else:
-            direction = "f"
-
-        renamed_header = f"{kraken}_{isolate_name}|{lineage}|{isolate_id}|{direction}|{subtype}|{segment}"
+            orientation = "f"
+        
+        renamed_header = f"{kraken}_{isolate_name}|{lineage}|{isolate_id}|{orientation}|{subtype}|{segment}"
         record.id = renamed_header
         record.description = renamed_header
         renamed_fastas.append(record)
@@ -63,6 +109,6 @@ if __name__ == "__main__":
     reverse_complementary_headers = sys.argv[3]
     rename_header(
         fasta,
-        get_influenza_B_metadata(metadata),
+        get_metadata_from_excel(metadata),
         read_header_list(reverse_complementary_headers),
     )
