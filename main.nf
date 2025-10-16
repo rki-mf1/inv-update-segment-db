@@ -17,7 +17,7 @@ workflow {
         | concat_metadata_excel_files
         | set { metadata }
 
-    // collect all segemnts and filter them
+    // collect all segments and filter them
     Channel.fromPath(params.input_segments, checkIfExists: true)
         | collect
         | concat_fasta
@@ -29,7 +29,7 @@ workflow {
         | map { it -> tuple(it.simpleName.split('_')[0], it) }
         | set { segments }
     
-    // find and fix reverse complementary segemnts
+    // find and fix reverse complementary segments
     Channel.fromPath(params.references, checkIfExists: true)
         | map { it -> tuple(it.simpleName.split('_')[0], it) }
         | align_reference
