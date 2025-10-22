@@ -161,3 +161,7 @@ Per default: -profile slurm,mamba is executed.
 ## Citations
 
 A list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
+
+## Funding
+
+This project was supported by co-funding from the European Union’s EU4Health programme under project no. 101113012 (IMS-HERA2).
