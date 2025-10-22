@@ -67,20 +67,19 @@ The assumptions about input FASTA header and input metadata are quite tailored t
 
 ### --input_segments
 
-Assumed header: 8 fields separated by `|` , `segment` required in the second and `isolate_id` in the fourth field:
+Assumed header: variable number of fields separated by `|`, where 
 
-```
->number|segment|isolate_name|isolate_id|empty|subtype
-```
+- one field has to be one of ["HA", "MP", "NA", "NP", "NS", "PA", "PB1", "PB2"], and,
+- one field has to match an isolate ID: `^EPI_ISL_\d+$`
 
 ### --input_metadata
 
 - Required fields: `Isolate_Id`, `Isolate_Name`, `Subtype`, `Lineage`
-- `Isolate_Id` in the table needs to match `isolate_id` in the input_segments FASTA header
+- `Isolate_Id` in the table needs to match the isolate ID in the `--input_segments` FASTA header (see above)
 
 ### --references
 
-- Required prefix: `segment_`, where segment is one of ["HA", "MP", "NA", "NP", "NS", "PA", "PA", "PB1", "PB2"]
+- Required prefix: `segment_`, where segment is one of ["HA", "MP", "NA", "NP", "NS", "PA", "PB1", "PB2"]
   - e.g. `HA_reference.fasta`
 
 ### Output segment FASTA header format
@@ -120,8 +119,10 @@ nextflow run rki-mf1/inv-update-segment-db \
 
 Required parameters:
 --input_segments (Multi) FASTA file(s)
-        Assumed header: 8 fields separated by `|` , `segment` required in the second and `isolate_id` in the fourth field:
-        >number|segment|isolate_name|isolate_id|empty|subtype
+        Assumed header: fields separated by `|`, where 
+                - one field has to be one of ["HA", "MP", "NA", "NP", "NS", "PA", "PB1", "PB2"], 
+                AND
+                - one field has to match an isolate ID: `^EPI_ISL_\d+$`
 --input_metadata Excel table(s) containing metadata for --input_segments
         Required fields: `Isolate_Id`, `Isolate_Name`, `Subtype`, `Lineage`
         `Isolate_Id` in the table needs to match `isolate_id` in the input_segments fasta header
@@ -160,3 +161,7 @@ Per default: -profile slurm,mamba is executed.
 ## Citations
 
 A list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
+
+## Funding
+
+This project was supported by co-funding from the European Union’s EU4Health programme under project no. 101113012 (IMS-HERA2).

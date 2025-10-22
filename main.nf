@@ -4,9 +4,9 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 //include modules
-include { concat_metadata_excel_files } from "./modules/metadata"
-include { rename_headers; split_by_segment; concat_fasta } from "./modules/utils"
-include { filter_fasta; get_stats; remove_duplicates } from "./modules/qc"
+include { concat_metadata_excel_files                                        } from "./modules/metadata"
+include { rename_headers; split_by_segment; concat_fasta                     } from "./modules/utils"
+include { filter_fasta; get_stats; remove_duplicates                         } from "./modules/qc"
 include { align_reference; add_align_segments; correct_reverse_complements;  } from "./modules/rev-comp"
 
 
@@ -17,7 +17,7 @@ workflow {
         | concat_metadata_excel_files
         | set { metadata }
 
-    // collect all segemnts and filter them
+    // collect all segments and filter them
     Channel.fromPath(params.input_segments, checkIfExists: true)
         | collect
         | concat_fasta
@@ -29,7 +29,7 @@ workflow {
         | map { it -> tuple(it.simpleName.split('_')[0], it) }
         | set { segments }
     
-    // find and fix reverse complementary segemnts
+    // find and fix reverse complementary segments
     Channel.fromPath(params.references, checkIfExists: true)
         | map { it -> tuple(it.simpleName.split('_')[0], it) }
         | align_reference
@@ -59,11 +59,13 @@ def helpMSG() {
 
     ${c_yellow}Required parameters:${c_reset}
     ${c_green}--input_segments${c_reset} (Multi) FASTA file(s) 
-            ${c_dim}Assumed header: 8 fields separated by `|` , `segment` required in the second and `isolate_id` in the fourth field:
-            >number|segment|isolate_name|isolate_id|empty|subtype${c_dim}
+            ${c_dim}Assumed header: fields separated by `|`, where 
+                    - one field has to be one of ["HA", "MP", "NA", "NP", "NS", "PA", "PB1", "PB2"], 
+                    AND
+                    - one field has to match an isolate ID: `^EPI_ISL_\\d+\$`${c_dim}
     ${c_green}--input_metadata${c_reset} Excel table(s) containing metadata for --input_segments
             ${c_dim}Required fields: `Isolate_Id`, `Isolate_Name`, `Subtype`, `Lineage`
-            `Isolate_Id` in the table needs to match `isolate_id` in the input_segments fasta header ${c_dim}
+            `Isolate_Id` in the table needs to match the isolate ID in the input_segments fasta header ${c_dim}
     ${c_green}--references${c_reset}     8 (multi) FASTA files containing reference sequences for each segment. The references are used
             to check if the input_segments are reverse complementary compared to the references.
             ${c_dim}Required prefix: `segment_`, where segment is one of [HA, MP, NA, NP, NS, PA, PB1, PB2]
