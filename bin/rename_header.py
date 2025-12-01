@@ -81,10 +81,10 @@ def rename_header(fasta, metadata, reverse_complementary_headers):
         segment = get_segment_from_fasta_header(record.id)
         isolate_id = get_isolateid_from_fasta_header(record.id)
         isolate_name = get_field_value(metadata, isolate_id, "Isolate_Name")
-        subtype = get_field_value(metadata, isolate_id, "Subtype").replace(" ", "_")
+        subtype = get_field_value(metadata, isolate_id, "Subtype")
         lineage = get_field_value(metadata, isolate_id, "Lineage")
 
-        assert subtype[0] in ["A", "B"]
+        assert subtype[0] in ["A", "B"], "Unexpected subtype."
         if subtype[0] == "A":
             kraken = "kraken:taxid|11320"
         elif subtype[0] == "B":
@@ -95,7 +95,10 @@ def rename_header(fasta, metadata, reverse_complementary_headers):
         else:
             orientation = "f"
 
-        renamed_header = f"{kraken}_{isolate_name}|{lineage}|{isolate_id}|{orientation}|{subtype}|{segment}"
+        # replace all spaces with _ to get proper fasta header for downstream processes
+        renamed_header = f"{kraken}_{isolate_name}|{lineage}|{isolate_id}|{orientation}|{subtype}|{segment}".replace(
+            " ", "_"
+        )
         record.id = renamed_header
         record.description = renamed_header
         renamed_fastas.append(record)
