@@ -98,6 +98,8 @@ def rename_header(fasta, metadata, reverse_complementary_headers):
         # replace all spaces with _ to get proper fasta header for downstream processes
         renamed_header = f"{kraken}_{isolate_name}|{lineage}|{isolate_id}|{orientation}|{subtype}|{segment}".replace(
             " ", "_"
+        ).replace(
+            ",", "_"
         )
         record.id = renamed_header
         record.description = renamed_header
